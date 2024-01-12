@@ -1,3 +1,8 @@
+[!] Liste des fichiers : 
+build-SQL_QT... ->Ne pas toucher
+Save -> Contient le code d'une version antérieur du programme
+SQL_QT -> Dernière version du programme
+t -> fichier contenant une sauvegarde de code
 
 --- Général --- Version: 2.1 (2024-01-11) 
 
