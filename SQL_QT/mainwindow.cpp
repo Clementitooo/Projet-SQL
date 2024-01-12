@@ -127,9 +127,10 @@ void MainWindow::SelectionTable(const QModelIndex &index)
 
    VerificationTable=0;
 
-   ui->AfficheSQL->clearSelection();
-   ui->Selection->setCurrentIndex(0);
-   Request="";
+   //ui->AfficheSQL->clearSelection();
+   QString test=ui->Selection->currentText();
+   //ui->Selection->setCurrentIndex(0);
+   RecupSelection(test);
 }
 
 void MainWindow::Openlog(){
@@ -258,7 +259,7 @@ void MainWindow::ExecuterRequete(){
    QString RecupTxt;
    //FILTRE REGISTRE SI NECESSAIRE (selon la requete)
    if (VerificationTable==0){
-        Request=Request + " " + Table;
+        //Request=Request + " " + Table;
         VerificationTable=1;
    }
    if (Register==21){
