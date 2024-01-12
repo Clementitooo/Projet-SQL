@@ -34,11 +34,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->EtatDBL->setStyleSheet("QLabel { border: none; }");
     ui->EtatRequeteL->setStyleSheet("QLabel { border: none; }");
 
-
-
-
-
-
     //Signaux Boutons---
     connect(ui->Quit,SIGNAL(clicked()),qApp,SLOT(quit()));
 
@@ -76,6 +71,7 @@ MainWindow::~MainWindow()
 //------------------- Interface ---------------------
 //---------------------------------------------------
 
+
 void MainWindow::ClearLogs(){
     QString Onglet=ui->MenuLog->tabText(ui->MenuLog->currentIndex());
     if (Onglet=="Log SQL")
@@ -98,25 +94,47 @@ void MainWindow::SaveLog(){
     QString NomFichier="save.txt"; //Déclaration du fichier dans lequel sauvegarder, ne pas changer [!]
     QFile save(NomFichier);
 
-        if(save.open(QIODevice::WriteOnly | QIODevice::Text)){
-            QTextStream txt(&save); //Variable du texte a envoyer
-            txt << ContenuSQL; //Transfert du contenu du QTextEdit au fichier
-            ui->LogSQL->append("oui");
-            save.close(); //Fermeture du fichier
+    if(save.open(QIODevice::WriteOnly | QIODevice::Text)){
+        QTextStream txt(&save); //Variable du texte a envoyer
+        txt << ContenuSQL; //Transfert du contenu du QTextEdit au fichier
+        ui->LogSQL->append("oui");
+        save.close(); //Fermeture du fichier
 
+    }
+    else{
+        ui->LogSQL->append("AZEIO");
+    }
 }
-        else{
-            ui->LogSQL->append("AZEIO");
-        }
+
+
+
+void MainWindow::SelectionTable(const QModelIndex &index)
+{
+   if (index.isValid()) {
+        QVariant selectedValue = ui->ListeTable->model()->data(index, Qt::DisplayRole);
+            Table=selectedValue.toString();
+            qDebug() << "Valeur sélectionnée : " << selectedValue.toString();
 }
+   //Actualisation de la table pour la requete ------->non utiliser
+   //QString test = ui->Selection->currentText();
+   //RecupSelection(test);
 
+   //Affichage de la table selectionner
+   if (Table.size()==NULL)
+            QMessageBox::information(this,QString("InfoBox"),QString("DoubleCliquer sur une table pour utiliser les interactions"));
+   else
+            ui->TableSelectionner->setText(Table);
 
+   VerificationTable=0;
 
+   ui->AfficheSQL->clearSelection();
+   ui->Selection->setCurrentIndex(0);
+   Request="";
+}
 
 void MainWindow::Openlog(){
-    Logs.show();
+   Logs.show();
 }
-
 
 
 //------------------------------------------------------------
@@ -160,18 +178,15 @@ void MainWindow::RecupSelection(QString Selec){
     ui->Topic->setText("");
     if (ChoixMenu=="Affichage"){
         if (Selec=="LIGNE COUNT"){
-            SRequest="SELECT COUNT (*) FROM ";
-            Request=SRequest + Table;
+            Request="SELECT COUNT(*) FROM "+ Table;
             Register=11;
         }
         else if(Selec=="DESCRIBE"){
-            SRequest="DESCRIBE ";
-            Request=SRequest + Table;
+            Request="DESCRIBE " + Table;
             Register=12;
         }
         else if(Selec=="SELECT"){
-            SRequest="SELECT * FROM ";
-            Request=SRequest + Table;
+            Request="SELECT * FROM " + Table;
             Register=13;
         }
     }
@@ -184,8 +199,7 @@ void MainWindow::RecupSelection(QString Selec){
         }
 
         if (Selec=="Supprimer une table"){
-            SRequest="DROP TABLE ";
-            Request=SRequest + Table;
+            Request="DROP TABLE " + Table;
             Register=22;
         }
 
@@ -222,29 +236,6 @@ void MainWindow::RecupSelection(QString Selec){
 //---------------------------------------------------
 //---------------------- SQL ------------------------
 //---------------------------------------------------
-void MainWindow::SelectionTable(const QModelIndex &index)
-{
-   if (index.isValid()) {
-        QVariant selectedValue = ui->ListeTable->model()->data(index, Qt::DisplayRole);
-            Table=selectedValue.toString();
-            qDebug() << "Valeur sélectionnée : " << selectedValue.toString();
-}
-   //Actualisation de la table pour la requete ------->non utiliser
-   //QString test = ui->Selection->currentText();
-   //RecupSelection(test);
-
-   //Affichage de la table selectionner
-   if (Table.size()==NULL)
-            QMessageBox::information(this,QString("InfoBox"),QString("DoubleCliquer sur une table pour utiliser les interactions"));
-   else
-            ui->TableSelectionner->setText(Table);
-
-   VerificationTable=0;
-
-   QString name=ui->Selection->currentText();
-   RecupSelection(name);
-}
-
 
 void MainWindow::GetLogin(QString Ip,QString DbName,QString User,QString MDP){
    setHostName=Ip;
@@ -259,48 +250,48 @@ void MainWindow::ExecuterRequete(){
    //Generation d'un horodotage pour les LOGS
    QDateTime Horodotage = QDateTime::currentDateTime();
    QString Converter = Horodotage.toString("dddd, d MMMM yyyy hh:mm:ss");
-    //Alerte de selection
-    if (Table.size()==NULL)
+   //Alerte de selection
+   if (Table.size()==NULL)
         QMessageBox::information(this,QString("InfoBox"),QString("DoubleCliquer sur une table pour utiliser les interactions"));
 
 
-    QString RecupTxt;
-    //FILTRE REGISTRE SI NECESSAIRE (selon la requete)
-    if (VerificationTable==0){
+   QString RecupTxt;
+   //FILTRE REGISTRE SI NECESSAIRE (selon la requete)
+   if (VerificationTable==0){
         Request=Request + " " + Table;
         VerificationTable=1;
-    }
-    if (Register==21){
+   }
+   if (Register==21){
         RecupTxt=ui->CompleteInfo->text();
         Request = "ALTER TABLE "+ Table +" ADD COLUMN " + RecupTxt;
         ui->Topic->setText("Ajout..");
         ui->Topic->setText(Request);
-    }
-    if (Register==23){
+   }
+   if (Register==23){
         RecupTxt=ui->CompleteInfo->text();
         Request = "ALTER TABLE "+ Table +" DROP COLUMN " + RecupTxt;
         ui->Topic->setText("Suppression..");
         ui->Topic->setText(Request);
-    }
-    if (Register==31){
+   }
+   if (Register==31){
         Request=ui->RequestLine->text();
-    }
+   }
 
 
-    // instanciation de la variable db
-    db = QSqlDatabase::addDatabase("QMYSQL");
+   // instanciation de la variable db
+   db = QSqlDatabase::addDatabase("QMYSQL");
 
-    // définition des paramètres de connexion à la base de données
-    db.setHostName(setHostName); // @ip serveur mysql
-    db.setDatabaseName(DatabaseName); // nom de la base
-    db.setUserName(UserName); // nom utilisateur
-    db.setPassword(Password); // mot de passe
+   // définition des paramètres de connexion à la base de données
+   db.setHostName(setHostName); // @ip serveur mysql
+   db.setDatabaseName(DatabaseName); // nom de la base
+   db.setUserName(UserName); // nom utilisateur
+   db.setPassword(Password); // mot de passe
 
 
-    //CONNEXION DB
+   //CONNEXION DB
 
-    //CONNECTER A LA DB------------
-    if(db.open()) {
+   //CONNECTER A LA DB------------
+   if(db.open()) {
 
         qDebug() << "ok - ouverture de la base de donnée";
                     ui->BarDB->setStyleSheet("background-color:lightgreen");
@@ -341,35 +332,8 @@ void MainWindow::ExecuterRequete(){
         db.close();
 
 
-    }
-
-    //ERREUR CONNEXION DB-----------------------------------------------
-    else {
-        qDebug() << "echec d'ouverture de la base de donnée";
-            qDebug() << db.lastError();
-
-        //Actualisation status DB
-        ui->BarDB->setStyleSheet("background-color:red");
-
-        QString RecupErreur=db.lastError().text();
-
-        qDebug() << QSqlDatabase::drivers();
-
-
-        TextLogs.append(Converter); //Generation de l'horodotage dans le QDialog--
-        ui->LogDB->append(Converter); //Génération de l'horodotage dans l'onglet--
-
-        TextLogs.append("ErreurDB : "+ RecupErreur); //Generation de la ligne requete dans le QDialog--
-        ui->LogDB->append("ErreurDB : "+ RecupErreur); //Generation de la ligne requete dans l'onglet--
-        ui->LogSQL->append("");
-        ui->LogSQL->append("");
-        TextLogs.append("--");
-
-        //Alerte sur l erreur
-        QMessageBox::warning(this,QString("InfoBox"),RecupErreur);
-    }
+   }
 }
-
 
 void MainWindow::ActualiserShowTable(){
     db = QSqlDatabase::addDatabase("QMYSQL");

@@ -67,4 +67,9 @@ Register N°31 -> Developper Mod			 (Autonomie sur l'utilisation du logiciel)
 
 
 
+#[!}DISCLAIMER : 
+Dû a un enchaînement de modifications, une ligne de code à était involontairement supprimer créant ainsi un bug de génération des requêtes, lorsque vous 
+faites une requête et changez de table, vous ne pouvez pas réenvoyez directement la requête, vous devez reselectionner la requête à effectuer pour palier le bug,
+par manque de temps celui-ci n'a pas pu être fix.
 
+Le bouton save n'a pas pu être finit par manque de temps également..
