@@ -1,0 +1,10 @@
+Sauvegarde SQL du Friday, 12 January 2024 
+Friday, 12 January 2024 10:58:44
+Request : SELECT COUNT(*) FROM client client
+Friday, 12 January 2024 10:58:46
+Request : SELECT COUNT(*) FROM client client media
+Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'media' at line 1 QMYSQL: Unable to execute query
+
+
+Friday, 12 January 2024 10:58:52
+Request : DESCRIBE media

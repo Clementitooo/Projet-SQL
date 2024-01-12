@@ -1,0 +1,8 @@
+Friday, 12 January 2024 10:47:28
+Request :  commande
+Error : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'commande' at line 1 QMYSQL: Unable to execute query
+
+
+Friday, 12 January 2024 10:47:32
+Request : SELECT COUNT(*) FROM commande commande
+oui
