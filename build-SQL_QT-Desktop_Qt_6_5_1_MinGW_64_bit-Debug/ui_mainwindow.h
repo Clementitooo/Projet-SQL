@@ -181,7 +181,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
         MenuLog->setCurrentIndex(0);
 
 

@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->EtatDBL->setStyleSheet("QLabel { border: none; }");
     ui->EtatRequeteL->setStyleSheet("QLabel { border: none; }");
 
+
+
     //Signaux Boutons---
     connect(ui->Quit,SIGNAL(clicked()),qApp,SLOT(quit()));
 
@@ -90,20 +92,41 @@ void MainWindow::SaveLog(){
 
     QString TextSQL=ui->LogSQL->toPlainText();
     QString ContenuSQL = "Sauvegarde SQL du " + Converter +" \n" + TextSQL;
+    ui->LogDB->setText(ContenuSQL);
 
-    QString NomFichier="save.txt"; //Déclaration du fichier dans lequel sauvegarder, ne pas changer [!]
+    QString NomFichier=QDir::currentPath() + "/save.txt"; //Déclaration du fichier dans lequel sauvegarder, ne pas changer [!]
     QFile save(NomFichier);
 
-    if(save.open(QIODevice::WriteOnly | QIODevice::Text)){
-        QTextStream txt(&save); //Variable du texte a envoyer
-        txt << ContenuSQL; //Transfert du contenu du QTextEdit au fichier
-        ui->LogSQL->append("oui");
-        save.close(); //Fermeture du fichier
+    /* Vérification d'existance du fichier (a ne pas supprimer)
+    if (save.exists())
+    ui->LogSQL->append("EXISTE");
+    */
 
+    if (save.open(QIODevice::ReadWrite | QIODevice::Text)) { //Ouverture en écriture & lecture
+    if (save.error() == QFile::NoError) { //Vérification d'erreur sur l'ouverture
+        // Le fichier a été ouvert avec succès
+
+        QTextStream txt(&save); //Instance de communication avec le fichier
+        txt << ContenuSQL << "\n"; //envoi du contenu
+
+        /*Verification de l'écriture
+        if (!txt.atEnd()) {
+            ui->LogSQL->append("Écriture réussie dans le fichier.");
+        } else {
+            ui->LogSQL->append("Erreur d'écriture dans le fichier : " + save.errorString());
+        }
+        */
+
+        save.close();
+    } else {
+        // Affichez un message d'erreur
+        ui->LogSQL->append("Erreur d'ouverture du fichier : " + save.errorString());
     }
-    else{
-        ui->LogSQL->append("AZEIO");
-    }
+} else {
+    ui->LogSQL->append("AZEIO");
+}
+
+
 }
 
 

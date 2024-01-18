@@ -7,6 +7,7 @@
 #include <QSqlDatabase>
 #include <QDebug>
 
+#include <QInputDialog>
 #include <QTimer>
 
 using namespace std;
@@ -29,6 +30,8 @@ signals:
 private slots:
     void LaunchConnexion();
     void SetValue();
+    void SetStatus();
+    void Start();
 };
 
 #endif // POPUP_H
